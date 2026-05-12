@@ -14,20 +14,10 @@ permissions:
 jobs:
   security:
     runs-on: ubuntu-latest
-    continue-on-error: false
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # Optional: Only keep this if your repo really needs .NET for the scan.
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            6.0.x
-
-      - name: Run Microsoft Security DevOps (IaC)
+      - name: Run Microsoft Security DevOps
         id: msdo
         uses: microsoft/security-devops-action@latest
         with:
