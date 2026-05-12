@@ -1,39 +1,39 @@
 name: MSDO IaC Scan
-   
+
 on:
-     # Triggers the workflow on push or pull request events but only for the main branch
-     push:
-       branches: [ main ]
-   
-     pull_request:
-       branches: [ main ]
-   
-     workflow_dispatch:
-   
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+
 jobs:
-     security:
-       runs-on: ubuntu-latest
-       continue-on-error: false
-       strategy:
-         fail-fast: true
-   
-       steps:
-       - uses: actions/checkout@v3
-   
-       - uses: actions/setup-dotnet@v3
-         with:
-           dotnet-version: |
-             5.0.x
-             6.0.x
-   
-       - name: Run Microsoft Security DevOps
-         uses: microsoft/security-devops-action@preview
-         continue-on-error: false
-         id: msdo
-         with:
-           categories: 'IaC'
-   
-       - name: Upload alerts to Security tab
-         uses: github/codeql-action/upload-sarif@v2
-         with:
-           sarif_file: ${{ steps.msdo.outputs.sarifFile }}c
+  security:
+    runs-on: ubuntu-latest
+    continue-on-error: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Optional: Only keep this if your repo really needs .NET for the scan.
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            6.0.x
+
+      - name: Run Microsoft Security DevOps (IaC)
+        id: msdo
+        uses: microsoft/security-devops-action@latest
+        with:
+          categories: IaC
+
+      - name: Upload alerts to Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.msdo.outputs.sarifFile }}
